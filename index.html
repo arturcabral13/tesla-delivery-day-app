@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111827" />
+    <title>Tesla Model Y Juniper Delivery Assistant</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#overview">Skip to checklist</a>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Delivery day checklist</p>
+        <h1>Tesla Model Y Juniper Delivery Assistant</h1>
+      </div>
+      <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle dark mode">
+        <span aria-hidden="true">◐</span>
+      </button>
+    </header>
+
+    <main>
+      <section class="dashboard" id="overview" aria-label="Inspection overview">
+        <article class="progress-card">
+          <div class="card-title-row">
+            <h2>Tesla Model Y Juniper Delivery</h2>
+            <span class="pill" id="overallPercent">0%</span>
+          </div>
+          <dl class="stats-grid">
+            <div>
+              <dt>Overall Progress</dt>
+              <dd id="overallCount">0 / 0 Items</dd>
+            </div>
+            <div>
+              <dt>Estimated Time Remaining</dt>
+              <dd id="timeRemaining">0 min</dd>
+            </div>
+            <div>
+              <dt>Critical Issues Found</dt>
+              <dd id="criticalCount">0</dd>
+            </div>
+            <div>
+              <dt>Notes Added</dt>
+              <dd id="notesCount">0</dd>
+            </div>
+          </dl>
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="overallBar"></div>
+          </div>
+          <div class="quick-actions">
+            <button class="primary-action" id="expandAll" type="button">Expand All</button>
+            <button class="secondary-action" id="collapseAll" type="button">Collapse All</button>
+            <button class="secondary-action" id="resetProgress" type="button">Reset</button>
+          </div>
+        </article>
+
+        <article class="vehicle-card">
+          <div class="card-title-row">
+            <h2>Inspection Zones</h2>
+            <span class="legend-note">Tap a zone</span>
+          </div>
+          <div class="vehicle-wrap" id="vehicleZones" aria-label="Clickable vehicle inspection zones"></div>
+          <div class="legend">
+            <span><i class="dot gray"></i>Not Started</span>
+            <span><i class="dot blue"></i>In Progress</span>
+            <span><i class="dot green"></i>Complete</span>
+            <span><i class="dot red"></i>Issue Found</span>
+          </div>
+        </article>
+      </section>
+
+      <nav class="section-nav" aria-label="Checklist sections">
+        <div class="nav-scroll" id="sectionNav"></div>
+      </nav>
+
+      <section class="field-card vehicle-fields" aria-label="Vehicle details">
+        <label>
+          VIN
+          <input id="vinInput" autocomplete="off" placeholder="Enter VIN" />
+        </label>
+        <label>
+          Delivery Date
+          <input id="deliveryDateInput" type="date" />
+        </label>
+      </section>
+
+      <section class="checklist" id="checklist" aria-label="Delivery checklist"></section>
+
+      <section class="critical-page" id="critical">
+        <div class="card-title-row">
+          <div>
+            <p class="eyebrow">Auto-generated</p>
+            <h2>Critical Issues Page</h2>
+          </div>
+          <button class="primary-action" id="exportIssues" type="button">Export Summary</button>
+        </div>
+        <div id="criticalList" class="critical-list"></div>
+      </section>
+
+      <section class="completion-card" id="completionCard" hidden>
+        <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+        <h2>Delivery Inspection Complete</h2>
+        <p id="completionSummary">Total Items Checked: 0 · Issues Found: 0</p>
+        <p id="completionTime">Completion Time: 0 min</p>
+        <button class="primary-action" id="generateReportComplete" type="button">Generate Delivery Report</button>
+      </section>
+    </main>
+
+    <dialog id="reportDialog" class="report-dialog">
+      <div class="report-actions no-print">
+        <button class="secondary-action" id="closeReport" type="button">Close</button>
+        <button class="primary-action" id="printReport" type="button">Export to PDF</button>
+      </div>
+      <article id="reportContent" class="report-content"></article>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
