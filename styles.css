@@ -219,7 +219,7 @@ main {
 .secondary-action,
 .icon-button,
 .status-button,
-.photo-button,
+.photo-taken-control,
 .issue-button {
   min-height: 44px;
   border: 1px solid var(--line);
@@ -237,7 +237,7 @@ main {
 .secondary-action,
 .icon-button,
 .status-button,
-.photo-button,
+.photo-taken-control,
 .issue-button {
   background: var(--surface-2);
   color: var(--text);
@@ -535,7 +535,7 @@ textarea {
 }
 
 .status-button,
-.photo-button,
+.photo-taken-control,
 .issue-button {
   padding: 0 8px;
   font-size: 0.82rem;
@@ -546,9 +546,25 @@ textarea {
   color: var(--red);
 }
 
-.photo-button.active {
-  border-color: var(--blue);
-  color: var(--blue);
+.photo-taken-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  color: var(--text);
+}
+
+.photo-taken-control input {
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  padding: 0;
+  accent-color: var(--blue);
+}
+
+.photo-taken-control span {
+  overflow-wrap: anywhere;
 }
 
 .item-notes {

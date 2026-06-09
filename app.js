@@ -164,7 +164,13 @@ function saveState() {
 }
 
 function itemState(id) {
-  return state.items[id] || { status: "not", notes: "", photo: false, updatedAt: null };
+  const current = state.items[id] || {};
+  return {
+    status: current.status || "not",
+    notes: current.notes || "",
+    photoTaken: current.photoTaken ?? current.photo ?? false,
+    updatedAt: current.updatedAt || null
+  };
 }
 
 function setItemState(id, patch) {
@@ -298,7 +304,10 @@ function itemMarkup(id, name) {
       <div class="item-actions">
         <button class="status-button" data-status="${id}" type="button">Status</button>
         <button class="issue-button" data-issue="${id}" type="button">Issue</button>
-        <button class="photo-button" data-photo="${id}" type="button">Photo</button>
+        <label class="photo-taken-control">
+          <input data-photo-taken="${id}" type="checkbox" />
+          <span>Photo taken</span>
+        </label>
       </div>
       <textarea class="item-notes" data-notes="${id}" placeholder="Notes"></textarea>
       <span class="note-time" data-note-time="${id}"></span>
@@ -311,16 +320,15 @@ function attachItemHandlers(node) {
   const checkbox = node.querySelector(`[data-check="${id}"]`);
   const statusButton = node.querySelector(`[data-status="${id}"]`);
   const issueButton = node.querySelector(`[data-issue="${id}"]`);
-  const photoButton = node.querySelector(`[data-photo="${id}"]`);
+  const photoTaken = node.querySelector(`[data-photo-taken="${id}"]`);
   const notes = node.querySelector(`[data-notes="${id}"]`);
 
   checkbox.addEventListener("change", () => setItemState(id, { status: checkbox.checked ? "pass" : "not" }));
   statusButton.addEventListener("click", () => setItemState(id, { status: nextStatus(itemState(id).status) }));
   issueButton.addEventListener("click", () => setItemState(id, { status: itemState(id).status === "failed" ? "attention" : "failed" }));
-  photoButton.addEventListener("click", () => {
-    const next = !itemState(id).photo;
-    setItemState(id, { photo: next });
-    showToast(next ? "Photo placeholder added" : "Photo placeholder removed");
+  photoTaken.addEventListener("change", () => {
+    setItemState(id, { photoTaken: photoTaken.checked });
+    showToast(photoTaken.checked ? "Photo marked as taken" : "Photo mark removed");
   });
   notes.addEventListener("input", () => setItemState(id, { notes: notes.value }));
 }
@@ -354,7 +362,7 @@ function renderItem(id) {
   const checkbox = document.querySelector(`[data-check="${id}"]`);
   const chip = document.querySelector(`[data-status-chip="${id}"]`);
   const issue = document.querySelector(`[data-issue="${id}"]`);
-  const photo = document.querySelector(`[data-photo="${id}"]`);
+  const photoTaken = document.querySelector(`[data-photo-taken="${id}"]`);
   const notes = document.querySelector(`[data-notes="${id}"]`);
   const noteTime = document.querySelector(`[data-note-time="${id}"]`);
   if (!checkbox) return;
@@ -362,8 +370,7 @@ function renderItem(id) {
   chip.textContent = statusLabel(current.status);
   chip.className = `status-chip status-${current.status}`;
   issue.classList.toggle("active", current.status === "failed");
-  photo.classList.toggle("active", current.photo);
-  photo.textContent = current.photo ? "Photo ✓" : "Photo";
+  photoTaken.checked = current.photoTaken;
   if (document.activeElement !== notes) notes.value = current.notes || "";
   noteTime.textContent = current.updatedAt ? `Updated ${formatTime(current.updatedAt)}` : "";
 }
@@ -426,7 +433,7 @@ function renderCriticalList() {
         <div class="critical-meta">
           <span>Location: ${item.sectionTitle} / ${item.groupTitle}</span>
           <span>Priority: Critical</span>
-          <span>Photo: ${current.photo ? "Placeholder added" : "Placeholder empty"}</span>
+          <span>Photo taken: ${current.photoTaken ? "Yes" : "No"}</span>
         </div>
         <p>${current.notes.trim() || "No notes added."}</p>
       </article>
@@ -488,7 +495,7 @@ function generateReport(issuesOnly = false) {
 
   const rows = (items) => items.map((item) => {
     const current = itemState(item.id);
-    return `<tr><td>${item.name}</td><td>${item.sectionTitle}</td><td>${statusLabel(current.status)}</td><td>${current.photo ? "Photo placeholder" : ""}</td><td>${current.notes || ""}</td></tr>`;
+    return `<tr><td>${item.name}</td><td>${item.sectionTitle}</td><td>${statusLabel(current.status)}</td><td>${current.photoTaken ? "Yes" : "No"}</td><td>${current.notes || ""}</td></tr>`;
   }).join("");
 
   document.getElementById("reportContent").innerHTML = `
@@ -502,12 +509,12 @@ function generateReport(issuesOnly = false) {
     <p><strong>Failed Items:</strong> ${failed.length}</p>
     <p><strong>Completion Time:</strong> ${elapsedMinutes()} min</p>
     <h2>${issuesOnly ? "Critical Issues" : "Failed Items"}</h2>
-    ${failed.length ? `<table><thead><tr><th>Issue Name</th><th>Location</th><th>Status</th><th>Photos</th><th>Notes</th></tr></thead><tbody>${rows(failed)}</tbody></table>` : "<p>No failed items recorded.</p>"}
+    ${failed.length ? `<table><thead><tr><th>Issue Name</th><th>Location</th><th>Status</th><th>Photo Taken</th><th>Notes</th></tr></thead><tbody>${rows(failed)}</tbody></table>` : "<p>No failed items recorded.</p>"}
     ${issuesOnly ? "" : `
       <h2>Passed Items</h2>
-      ${passed.length ? `<table><thead><tr><th>Item</th><th>Location</th><th>Status</th><th>Photos</th><th>Notes</th></tr></thead><tbody>${rows(passed)}</tbody></table>` : "<p>No passed items recorded.</p>"}
-      <h2>Photos Placeholders</h2>
-      <p>${itemMeta.filter((item) => itemState(item.id).photo).length} photo placeholders added.</p>
+      ${passed.length ? `<table><thead><tr><th>Item</th><th>Location</th><th>Status</th><th>Photo Taken</th><th>Notes</th></tr></thead><tbody>${rows(passed)}</tbody></table>` : "<p>No passed items recorded.</p>"}
+      <h2>Photo Tracking</h2>
+      <p>${itemMeta.filter((item) => itemState(item.id).photoTaken).length} items marked with photo taken.</p>
       <h2>Notes</h2>
       ${notes.length ? notes.map((note) => `<h3>${note.location}</h3><p>${note.text}</p>`).join("") : "<p>No notes added.</p>"}
     `}

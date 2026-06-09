@@ -8,7 +8,7 @@ Mobile-first delivery inspection checklist for a Tesla Model Y Juniper.
 - Progress tracking by section
 - Critical issue logging
 - Notes for checklist items and sections
-- Photo placeholders
+- Photo taken tracking
 - Printable delivery report
 - Light and dark mode
 - Local progress saving on your device
